@@ -1,65 +1,68 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(CanvasGroup))]
 public class FadeUI : MonoBehaviour
 {
-    public static FadeUI instance;
-
     [Header("Fade Settings")]
-    public CanvasGroup canvasGroup; // Assign the CanvasGroup of the target Canvas
-    public float startAlpha = 1f; // Alpha value at the start (1 = fully visible)
-    public float endAlpha = 0f;  // Alpha value at the end (0 = fully transparent)
-    public float duration = 1.0f;
+    public float animationSpeed = 1.0f; // Multiplier for fade speed (higher = faster)
 
+    private CanvasGroup canvasGroup;
     private bool isFading;
+    private float startAlpha;
+    private float endAlpha;
+    private float duration = 1.0f; // Duration of the fade animation
 
     private void Awake()
     {
-        // Ensure there is only one instance of FadeManager
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void Start()
-    {
+        canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
         {
-            Debug.LogError("FadeManager: 'canvasGroup' is not assigned. Please assign a CanvasGroup component.");
+            Debug.LogError("FadeUI: No CanvasGroup found. Please attach this script to a GameObject with a CanvasGroup.");
             return;
         }
-
-        // Set the initial alpha of the canvas
-        canvasGroup.alpha = startAlpha;
-        canvasGroup.blocksRaycasts = true;
-
-        // Start the FadeIn effect
-        FadeIn();
     }
 
+    /// <summary>
+    /// Fades in the UI element, enabling it first.
+    /// </summary>
     public void FadeIn()
     {
         if (!isFading)
         {
+            gameObject.SetActive(true); // Enable GameObject first
+            startAlpha = 0f;
+            endAlpha = 1f;
             StartCoroutine(BeginFade());
         }
     }
 
-    private IEnumerator BeginFade()
+    /// <summary>
+    /// Fades out the UI element, disabling it after fade completes.
+    /// </summary>
+    public void FadeOut()
+    {
+        if (!isFading)
+        {
+            startAlpha = 1f;
+            endAlpha = 0f;
+            StartCoroutine(BeginFade(disableOnComplete: true));
+        }
+    }
+
+    private IEnumerator BeginFade(bool disableOnComplete = false)
     {
         isFading = true;
+        canvasGroup.alpha = startAlpha;
 
+        // Calculate adjusted duration based on animation speed
+        float adjustedDuration = duration / animationSpeed;
         float timer = 0f;
 
-        while (timer < duration)
+        while (timer < adjustedDuration)
         {
-            // Lerp the alpha value from startAlpha to endAlpha over 'duration' time
-            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / duration);
+            // Lerp the alpha value from startAlpha to endAlpha over adjusted duration
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timer / adjustedDuration);
             timer += Time.deltaTime;
             yield return null;
         }
@@ -67,12 +70,16 @@ public class FadeUI : MonoBehaviour
         // Ensure the final alpha value is set
         canvasGroup.alpha = endAlpha;
 
-        isFading = false;
-
-        // Optionally disable raycast blocking when fully transparent
-        if (endAlpha == 0f)
+        if (disableOnComplete && endAlpha == 0f)
         {
-            canvasGroup.blocksRaycasts = false;
+            canvasGroup.blocksRaycasts = false; // Disable raycasts
+            gameObject.SetActive(false); // Disable GameObject after fade out
         }
+        else
+        {
+            canvasGroup.blocksRaycasts = true; // Enable raycasts when visible
+        }
+
+        isFading = false;
     }
 }
