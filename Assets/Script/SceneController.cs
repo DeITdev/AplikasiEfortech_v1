@@ -17,6 +17,11 @@ public class SceneController : MonoBehaviour
         StartCoroutine(LoadSceneWithDelay("Onboard"));
     }
 
+    public void ARGame()
+    {
+        StartCoroutine(LoadSceneWithDelay("AR Game"));
+    }
+
     // Coroutine to handle the scene change with a delay
     private IEnumerator LoadSceneWithDelay(string sceneName)
     {
