@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848409ee8ba454f42a5ddff137688a27, type: 3}
+  m_Name: EfortechBox
+  m_EditorClassIdentifier: 
+  m_GuidLow: 4818637961944570704
+  m_GuidHigh: 4526807167510266247
+  m_DataStore:
+    m_Storage: []
+  m_Images:
+  - m_SerializedGuid:
+      m_GuidLow: 5705041418213236430
+      m_GuidHigh: 8413838668116368011
+    m_SerializedTextureGuid:
+      m_GuidLow: 4532005238526480587
+      m_GuidHigh: 4587076499741679051
+    m_Size: {x: 0.1, y: 0.1}
+    m_SpecifySize: 1
+    m_Name: EfortechBoxReference
+    m_Texture: {fileID: 2800000, guid: ba9490cbeac03ee4cb1da5ecc591a83f, type: 3}

@@ -6,6 +6,7 @@ public class FadeUI : MonoBehaviour
 {
     [Header("Fade Settings")]
     public float animationSpeed = 1.0f; // Multiplier for fade speed (higher = faster)
+    public bool useDelay = true; // Option to enable or disable delay before FadeIn opacity
 
     private CanvasGroup canvasGroup;
     private bool isFading;
@@ -30,11 +31,29 @@ public class FadeUI : MonoBehaviour
     {
         if (!isFading)
         {
-            gameObject.SetActive(true); // Enable GameObject first
-            startAlpha = 0f;
-            endAlpha = 1f;
-            StartCoroutine(BeginFade());
+            gameObject.SetActive(true); // Enable GameObject immediately
+
+            if (useDelay)
+            {
+                StartCoroutine(FadeInWithDelay());
+            }
+            else
+            {
+                startAlpha = 0f;
+                endAlpha = 1f;
+                StartCoroutine(BeginFade());
+            }
         }
+    }
+
+    private IEnumerator FadeInWithDelay()
+    {
+        canvasGroup.alpha = 0f; // Set initial alpha to 0
+        yield return new WaitForSeconds(1f); // Delay of 1 second for opacity change
+
+        startAlpha = 0f;
+        endAlpha = 1f;
+        StartCoroutine(BeginFade());
     }
 
     /// <summary>
