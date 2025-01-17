@@ -3,73 +3,92 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using TMPro;
 
 public class Control_Scada : MonoBehaviour
 {
-    public string scadaServerIP = "192.168.1.31"; // SCADA server IP address
+    [SerializeField] private TMP_InputField ipAddressInput;
     private string username = "admin";
     private string password = ""; // No password
     private string project = "TrainerKit";
 
     public void TurnOnYellowLamp()
     {
-        StartCoroutine(SendScadaRequest("yellowLamp", 1));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("yellowLamp", 1));
     }
 
     public void TurnOffYellowLamp()
     {
-        StartCoroutine(SendScadaRequest("yellowLamp", 0));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("yellowLamp", 0));
     }
 
     public void TurnOnGreenLamp()
     {
-        StartCoroutine(SendScadaRequest("greenLamp", 1));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("greenLamp", 1));
     }
 
     public void TurnOffGreenLamp()
     {
-        StartCoroutine(SendScadaRequest("greenLamp", 0));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("greenLamp", 0));
     }
 
     public void TurnOnRedLamp()
     {
-        StartCoroutine(SendScadaRequest("redLamp", 1));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("redLamp", 1));
     }
 
     public void TurnOffRedLamp()
     {
-        StartCoroutine(SendScadaRequest("redLamp", 0));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("redLamp", 0));
     }
 
     public void TurnOnBuzzerLamp()
     {
-        StartCoroutine(SendScadaRequest("buzzerLamp", 1));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("buzzerLamp", 1));
     }
 
     public void TurnOffBuzzerLamp()
     {
-        StartCoroutine(SendScadaRequest("buzzerLamp", 0));
+        if (ValidateIPAddress())
+            StartCoroutine(SendScadaRequest("buzzerLamp", 0));
+    }
+
+    private bool ValidateIPAddress()
+    {
+        if (string.IsNullOrEmpty(ipAddressInput.text))
+        {
+            Debug.LogError("IP Address is required!");
+            return false;
+        }
+        return true;
     }
 
     private IEnumerator SendScadaRequest(string nametag, int value)
     {
-        string url = $"http://{scadaServerIP}/WaWebService/Json/SetTagValue/{project}/{nametag}/{value}";
-
+        string url = $"http://{ipAddressInput.text}/WaWebService/Json/SetTagValue/{project}/{nametag}/{value}";
         using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
         {
             // Add Basic Authentication header
             string credentials = System.Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
             webRequest.SetRequestHeader("Authorization", "Basic " + credentials);
-
             yield return webRequest.SendWebRequest();
 
-            if (webRequest.result == UnityWebRequest.Result.ConnectionError || webRequest.result == UnityWebRequest.Result.ProtocolError)
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
+                webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
                 Debug.LogError($"Error sending request to {url}: {webRequest.error}");
             }
             else
             {
                 Debug.Log($"Successfully sent request to {url}");
+                Debug.Log($"Response: {webRequest.downloadHandler.text}");
             }
         }
     }
