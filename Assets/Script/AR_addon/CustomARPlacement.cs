@@ -5,12 +5,14 @@ using System.Collections.Generic;
 
 public class CustomARPlacement : MonoBehaviour
 {
+    // Add these events at the top of the class
+    public static event System.Action OnObjectSpawned;
+    public static event System.Action OnObjectDestroyed;
+
     [SerializeField]
     private GameObject placementPrefab;
-
     [SerializeField]
     private float moveSpeed = 1f;
-
     private GameObject spawnedObject;
     private ARRaycastManager raycastManager;
     private bool isMoving = false;
@@ -36,12 +38,10 @@ public class CustomARPlacement : MonoBehaviour
 
         if (touch.phase == TouchPhase.Began)
         {
-            // If no object is spawned, try to place one
             if (spawnedObject == null)
             {
                 TryPlaceObject();
             }
-            // If object exists, check if we're touching it to move
             else if (IsTouchingObject())
             {
                 isMoving = true;
@@ -56,14 +56,14 @@ public class CustomARPlacement : MonoBehaviour
     private bool TryPlaceObject()
     {
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
-
         if (raycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
             spawnedObject = Instantiate(placementPrefab, hitPose.position, hitPose.rotation);
+            // Invoke the spawn event
+            OnObjectSpawned?.Invoke();
             return true;
         }
-
         return false;
     }
 
@@ -71,19 +71,16 @@ public class CustomARPlacement : MonoBehaviour
     {
         Ray ray = arCamera.ScreenPointToRay(touchPosition);
         RaycastHit hit;
-
         if (Physics.Raycast(ray, out hit))
         {
             return hit.collider.gameObject == spawnedObject;
         }
-
         return false;
     }
 
     private void MoveObject()
     {
         List<ARRaycastHit> hits = new List<ARRaycastHit>();
-
         if (raycastManager.Raycast(touchPosition, hits, TrackableType.PlaneWithinPolygon))
         {
             Pose hitPose = hits[0].pose;
@@ -92,7 +89,6 @@ public class CustomARPlacement : MonoBehaviour
                 hitPose.position,
                 Time.deltaTime * moveSpeed
             );
-
             spawnedObject.transform.position = targetPosition;
         }
     }
@@ -102,8 +98,16 @@ public class CustomARPlacement : MonoBehaviour
         if (spawnedObject != null)
         {
             Destroy(spawnedObject);
+            // Invoke the destroy event
+            OnObjectDestroyed?.Invoke();
             spawnedObject = null;
             isMoving = false;
         }
+    }
+
+    // Add this public method to check spawn state
+    public bool IsObjectSpawned()
+    {
+        return spawnedObject != null;
     }
 }
