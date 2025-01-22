@@ -9,11 +9,9 @@ using UnityEngine.UI;
 public class GET_Scada_TrainerKit : MonoBehaviour
 {
     [Header("Network Settings")]
-    [SerializeField] private TMP_InputField ipAddressInput;
+    [SerializeField] private TMP_InputField ipAddressInput;  // Keep this for initial input
     private bool isPolling = false;
     private Coroutine pollingCoroutine;
-    private string username = "admin";
-    private string password = ""; // No password
 
     [Header("Material References")]
     public Material buzzerLampMaterial;
@@ -53,6 +51,15 @@ public class GET_Scada_TrainerKit : MonoBehaviour
         public List<Values> Values;
     }
 
+    private void Start()
+    {
+        // Load saved IP if exists
+        if (!string.IsNullOrEmpty(ScadaConfigManager.Instance.GetIPAddress()))
+        {
+            ipAddressInput.text = ScadaConfigManager.Instance.GetIPAddress();
+        }
+    }
+
     public void OnCheckButtonClick()
     {
         if (!isPolling)
@@ -62,6 +69,10 @@ public class GET_Scada_TrainerKit : MonoBehaviour
                 Debug.LogError("IP Address is required!");
                 return;
             }
+
+            // Save IP to ScadaConfiguration
+            ScadaConfigManager.Instance.SetIPAddress(ipAddressInput.text);
+
             isPolling = true;
             pollingCoroutine = StartCoroutine(StartPolling());
         }
@@ -82,17 +93,23 @@ public class GET_Scada_TrainerKit : MonoBehaviour
 
     private IEnumerator MakeApiCall()
     {
-        string url = $"http://{ipAddressInput.text}/WaWebService/Json/GetTagValue/Express";
+        // Get IP from ScadaConfigManager
+        string url = $"http://{ScadaConfigManager.Instance.GetIPAddress()}/WaWebService/Json/GetTagValue/Express";
         string jsonBody = "{\"Tags\":[{\"Name\":\"BuzzerLamp\"},{\"Name\":\"greenLamp\"},{\"Name\":\"redLamp\"},{\"Name\":\"yellowLamp\"}]}";
 
         using (UnityWebRequest webRequest = UnityWebRequest.PostWwwForm(url, jsonBody))
         {
-            // Add headers for authorization
-            string credentials = System.Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
+            // Use stored username and password from ScadaConfigManager
+            string credentials = System.Convert.ToBase64String(
+                Encoding.ASCII.GetBytes(
+                    ScadaConfigManager.Instance.GetUsername() + ":" +
+                    ScadaConfigManager.Instance.GetPassword()
+                )
+            );
+
             webRequest.SetRequestHeader("Authorization", "Basic " + credentials);
             webRequest.SetRequestHeader("Content-Type", "application/json");
 
-            // Attach the body
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
             webRequest.uploadHandler = new UploadHandlerRaw(bodyRaw);
             webRequest.downloadHandler = new DownloadHandlerBuffer();

@@ -7,10 +7,16 @@ using TMPro;
 
 public class Control_Scada : MonoBehaviour
 {
-    [SerializeField] private TMP_InputField ipAddressInput;
-    private string username = "admin";
-    private string password = ""; // No password
     private string project = "TrainerKit";
+    private string username;
+    private string password;
+
+    private void Start()
+    {
+        // Get credentials from ScadaConfigManager
+        username = ScadaConfigManager.Instance.GetUsername();
+        password = ScadaConfigManager.Instance.GetPassword();
+    }
 
     public void TurnOnYellowLamp()
     {
@@ -62,9 +68,11 @@ public class Control_Scada : MonoBehaviour
 
     private bool ValidateIPAddress()
     {
-        if (string.IsNullOrEmpty(ipAddressInput.text))
+        // Check IP from ScadaConfigManager
+        string storedIP = ScadaConfigManager.Instance.GetIPAddress();
+        if (string.IsNullOrEmpty(storedIP))
         {
-            Debug.LogError("IP Address is required!");
+            Debug.LogError("IP Address is not set in configuration!");
             return false;
         }
         return true;
@@ -72,12 +80,17 @@ public class Control_Scada : MonoBehaviour
 
     private IEnumerator SendScadaRequest(string nametag, int value)
     {
-        string url = $"http://{ipAddressInput.text}/WaWebService/Json/SetTagValue/{project}/{nametag}/{value}";
+        // Use the stored IP from ScadaConfigManager
+        string ip = ScadaConfigManager.Instance.GetIPAddress();
+        string url = $"http://{ip}/WaWebService/Json/SetTagValue/{project}/{nametag}/{value}";
+
         using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
         {
-            // Add Basic Authentication header
-            string credentials = System.Convert.ToBase64String(Encoding.ASCII.GetBytes(username + ":" + password));
+            string credentials = System.Convert.ToBase64String(
+                Encoding.ASCII.GetBytes(username + ":" + password)
+            );
             webRequest.SetRequestHeader("Authorization", "Basic " + credentials);
+
             yield return webRequest.SendWebRequest();
 
             if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
