@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: a52b675fda20c764d950543d3ac87f6a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - scadaConfig: {fileID: 11400000, guid: cbc13ad0fbcebd14d8d1e3694849915d, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

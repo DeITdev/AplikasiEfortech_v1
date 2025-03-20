@@ -1,0 +1,37 @@
+fileFormatVersion: 2
+guid: 78616f8ac50724e4e87c59f96c593120
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - dataStorage: {fileID: 11400000, guid: 4c1e85da0e825184ea0aade5a48be4a9, type: 2}
+  - buzzerLampMaterial: {fileID: 2100000, guid: 3b6221a79fa946d41a11a1e7d2693bb1, type: 2}
+  - greenLampMaterial: {fileID: 2100000, guid: ca4e038473c33a7458a60805d0054669, type: 2}
+  - redLampMaterial: {fileID: 2100000, guid: 49cb5dbf09b2a4c40aaa44bc33bb79d7, type: 2}
+  - yellowLampMaterial: {fileID: 2100000, guid: 30bb9be44b083274f93c648c9d5c2429, type: 2}
+  - buzzerLampActiveButton: {instanceID: 0}
+  - buzzerLampInactiveButton: {instanceID: 0}
+  - greenLampActiveButton: {instanceID: 0}
+  - greenLampInactiveButton: {instanceID: 0}
+  - redLampActiveButton: {instanceID: 0}
+  - redLampInactiveButton: {instanceID: 0}
+  - yellowLampActiveButton: {instanceID: 0}
+  - yellowLampInactiveButton: {instanceID: 0}
+  - redButtonActiveButton: {instanceID: 0}
+  - redButtonInactiveButton: {instanceID: 0}
+  - greenButtonActiveButton: {instanceID: 0}
+  - greenButtonInactiveButton: {instanceID: 0}
+  - switch1ActiveButton: {instanceID: 0}
+  - switch1InactiveButton: {instanceID: 0}
+  - switch2ActiveButton: {instanceID: 0}
+  - switch2InactiveButton: {instanceID: 0}
+  - fanActiveButton: {instanceID: 0}
+  - fanInactiveButton: {instanceID: 0}
+  - fanObject: {instanceID: 0}
+  - currentInjectorText: {instanceID: 0}
+  - thermoCopleText: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

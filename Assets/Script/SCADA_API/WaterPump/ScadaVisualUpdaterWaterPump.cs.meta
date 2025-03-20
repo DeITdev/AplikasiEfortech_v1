@@ -1,0 +1,36 @@
+fileFormatVersion: 2
+guid: 5826eaf2f3fc52249946a50bdf2d9569
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - dataStorage: {fileID: 11400000, guid: 6a52b786cf7ee994d9a995185ef10fe2, type: 2}
+  - flow1Text: {instanceID: 0}
+  - flow2Text: {instanceID: 0}
+  - level1Text: {instanceID: 0}
+  - level2Text: {instanceID: 0}
+  - pressure1Text: {instanceID: 0}
+  - pressure2Text: {instanceID: 0}
+  - pressure3Text: {instanceID: 0}
+  - pressure4Text: {instanceID: 0}
+  - temp1_1Text: {instanceID: 0}
+  - temp1_2Text: {instanceID: 0}
+  - temp2_1Text: {instanceID: 0}
+  - temp2_2Text: {instanceID: 0}
+  - pump1_1Material: {instanceID: 0}
+  - pump1_2Material: {instanceID: 0}
+  - pump2_1Material: {instanceID: 0}
+  - pump2_2Material: {instanceID: 0}
+  - pump1_1ActiveButton: {instanceID: 0}
+  - pump1_1InactiveButton: {instanceID: 0}
+  - pump1_2ActiveButton: {instanceID: 0}
+  - pump1_2InactiveButton: {instanceID: 0}
+  - pump2_1ActiveButton: {instanceID: 0}
+  - pump2_1InactiveButton: {instanceID: 0}
+  - pump2_2ActiveButton: {instanceID: 0}
+  - pump2_2InactiveButton: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

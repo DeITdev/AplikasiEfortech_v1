@@ -16,6 +16,11 @@ public class ARManager : MonoBehaviour
     [SerializeField] private GameObject graphButton;
     [SerializeField] private GameObject noGraphButton;
 
+    [Header("Lock Control")]
+    [SerializeField] private LockPositionState lockPositionState;
+    [SerializeField] private GameObject lockButton;
+    [SerializeField] private GameObject unlockButton;
+
     private bool isObjectSpawned = false;
 
     private void Awake()
@@ -26,6 +31,8 @@ public class ARManager : MonoBehaviour
 
         // Initially hide all buttons
         if (deleteButton != null) deleteButton.SetActive(false);
+        if (lockButton != null) lockButton.SetActive(false);
+        if (unlockButton != null) unlockButton.SetActive(false);
         if (graphButton != null) graphButton.SetActive(false);
         if (noGraphButton != null) noGraphButton.SetActive(false);
 
@@ -33,10 +40,14 @@ public class ARManager : MonoBehaviour
         CustomARPlacement.OnObjectSpawned += HandleObjectSpawned;
         CustomARPlacement.OnObjectDestroyed += HandleObjectDestroyed;
 
-        // Initialize graph state subscription
+        // Initialize state subscriptions
         if (graphState != null)
         {
             graphState.OnGraphStateChanged += UpdateGraphButtonVisibility;
+        }
+        if (lockPositionState != null)
+        {
+            lockPositionState.OnLockStateChanged += UpdateLockButtonVisibility;
         }
     }
 
@@ -49,19 +60,24 @@ public class ARManager : MonoBehaviour
         {
             graphState.OnGraphStateChanged -= UpdateGraphButtonVisibility;
         }
+        if (lockPositionState != null)
+        {
+            lockPositionState.OnLockStateChanged -= UpdateLockButtonVisibility;
+        }
     }
 
     private void HandleObjectSpawned()
     {
         isObjectSpawned = true;
-        if (deleteButton != null)
-        {
-            deleteButton.SetActive(true);
-        }
-        // Update graph buttons visibility based on current state
+
+        // Update button visibility based on current states
         if (graphState != null)
         {
             UpdateGraphButtonVisibility(graphState.IsGraphVisible);
+        }
+        if (lockPositionState != null)
+        {
+            UpdateLockButtonVisibility(lockPositionState.IsUnlocked);
         }
     }
 
@@ -72,30 +88,52 @@ public class ARManager : MonoBehaviour
         {
             deleteButton.SetActive(false);
         }
-        // Hide both graph buttons
+        // Hide all buttons
         if (graphButton != null) graphButton.SetActive(false);
         if (noGraphButton != null) noGraphButton.SetActive(false);
+        if (lockButton != null) lockButton.SetActive(false);
+        if (unlockButton != null) unlockButton.SetActive(false);
     }
 
     private void UpdateGraphButtonVisibility(bool isGraphVisible)
     {
-        // Only show graph buttons if an object is spawned
         if (isObjectSpawned)
         {
-            if (graphButton != null)
+            if (graphButton != null) graphButton.SetActive(isGraphVisible);
+            if (noGraphButton != null) noGraphButton.SetActive(!isGraphVisible);
+        }
+        else
+        {
+            if (graphButton != null) graphButton.SetActive(false);
+            if (noGraphButton != null) noGraphButton.SetActive(false);
+        }
+    }
+
+    private void UpdateLockButtonVisibility(bool isUnlocked)
+    {
+        if (isObjectSpawned)
+        {
+            // When isUnlocked = true (free to move):
+            // - Show unlock button (clicking it will lock the object)
+            // - Hide lock button
+            // When isUnlocked = false (locked):
+            // - Show lock button (clicking it will unlock the object)
+            // - Hide unlock button
+            if (unlockButton != null) unlockButton.SetActive(isUnlocked);
+            if (lockButton != null) lockButton.SetActive(!isUnlocked);
+
+            // Show delete button only when object is freely moving (unlocked)
+            if (deleteButton != null)
             {
-                graphButton.SetActive(isGraphVisible);
-            }
-            if (noGraphButton != null)
-            {
-                noGraphButton.SetActive(!isGraphVisible);
+                deleteButton.SetActive(isUnlocked);
             }
         }
         else
         {
-            // Hide both buttons if no object is spawned
-            if (graphButton != null) graphButton.SetActive(false);
-            if (noGraphButton != null) noGraphButton.SetActive(false);
+            // Hide all buttons when no object is spawned
+            if (unlockButton != null) unlockButton.SetActive(false);
+            if (lockButton != null) lockButton.SetActive(false);
+            if (deleteButton != null) deleteButton.SetActive(false);
         }
     }
 
@@ -112,6 +150,48 @@ public class ARManager : MonoBehaviour
         if (graphState != null)
         {
             graphState.IsGraphVisible = true;
+        }
+    }
+
+    public void OnUnlockButtonClick()
+    {
+        if (lockPositionState != null && customPlacement != null)
+        {
+            // User clicked unlock button (which means object is free to move)
+            // So we want to lock it
+            lockPositionState.IsUnlocked = false;
+            customPlacement.SetLockState(true);
+
+            // Disable plane detection
+            if (planeManager != null)
+            {
+                planeManager.enabled = false;
+                foreach (var plane in planeManager.trackables)
+                {
+                    plane.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+
+    public void OnLockButtonClick()
+    {
+        if (lockPositionState != null && customPlacement != null)
+        {
+            // User clicked lock button (which means object is locked)
+            // So we want to unlock it
+            lockPositionState.IsUnlocked = true;
+            customPlacement.SetLockState(false);
+
+            // Re-enable plane detection
+            if (planeManager != null)
+            {
+                planeManager.enabled = true;
+                foreach (var plane in planeManager.trackables)
+                {
+                    plane.gameObject.SetActive(true);
+                }
+            }
         }
     }
 
